@@ -1,6 +1,13 @@
 # Data_viz_project
 ##Summary
-This data visualization project was completed as part of Udacity's data visualization course and is based on a data set of loans from Propser. 81 variables (e.g. loan amount, interest rate, etc.) for over 100,000 loans are contained in the dataset.
+This data viz project is a work in progress to fulfill requirements of Udacity's data visualization course.  The dataset is made available by [Prosper](https://www.prosper.com/) and includes 81 variables (e.g. loan amount, interest rate, etc.) for over 100,000 peer-to-peer loans.  
+
+####Next steps:
+
+* - [ ] add pie charts for each state 
+    * - [ ] size of pie chart represents total LoanOriginalAmount by state
+    * - [ ] pie slices representing the fraction of LoanOriginalAmount by CreditGrade
+* - [ ] Make the map a chloropleth representing DebtToIncomeRatio
 
 ##Design
 
