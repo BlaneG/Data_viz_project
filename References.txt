@@ -1,0 +1,4 @@
+d3 projections - https://github.com/mbostock/d3/wiki/Geo-Projections
+pie layout - https://github.com/mbostock/d3/wiki/Pie-Layout
+US shapefiles - http://www.census.gov/geo/maps-data/data/tiger-cart-boundary.html
+Let's make a bubble map - http://bost.ocks.org/mike/bubble-map/
