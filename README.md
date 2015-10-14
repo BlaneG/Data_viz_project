@@ -1,6 +1,6 @@
 # Data_viz_project
 ##Summary
-This data viz project is a work in progress to fulfill requirements of Udacity's data visualization course.  The dataset is made available by Prosper and includes 81 variables (e.g. loan amount, interest rate, etc.) for over 100,000 peer-to-peer loans.  
+This data viz project is a work in progress to fulfill requirements of Udacity's data visualization course.  The dataset is made available by [Prosper](https://www.prosper.com/) and includes 81 variables (e.g. loan amount, interest rate, etc.) for over 100,000 peer-to-peer loans.  
 
 ####Next steps:
 
