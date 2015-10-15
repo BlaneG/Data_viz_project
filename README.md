@@ -4,7 +4,10 @@ This data viz project is a work in progress to fulfill requirements of Udacity's
 
 ####Next steps:
 
-* - [ ] add pie charts for each state 
+* - [ ]  add bubble for each state
+		* - [ ] set domain of bubble to max(sum(loan)) summing loan for each state
+		* - [ ] adjust transparency of bubble
+* - [ ] convert bubble to pie charts for each state 
     * - [ ] size of pie chart represents total LoanOriginalAmount by state
     * - [ ] pie slices representing the fraction of LoanOriginalAmount by CreditGrade
 * - [ ] Make the map a chloropleth representing DebtToIncomeRatio
