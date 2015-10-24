@@ -43,8 +43,8 @@
             //debugger;  
             //console.table(loan_data.slice(0,10));
               //plot data
-              /*
-                var nested = d3.nest()
+              
+                var totalLoanAmountByState = d3.nest()
                                 //the .key function is used for grouping data using 
                                 //an accessor call-back function                
                                 .key(function(d) {
@@ -63,8 +63,8 @@
                                     };
                                 })
                                 .entries(loan_data);
-                                debugger;
-               */                
+                                
+                               
                 //location of bubbles
                 var bubbles = svg.append("g")
                                   .attr("class", "bubble")
