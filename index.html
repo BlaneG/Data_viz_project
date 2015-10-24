@@ -7,46 +7,101 @@
     </style>
     <script type="text/javascript">  
       function draw(geo_data) {
-        "use strict";
-        var margin = 75,
-            width = 1400 - margin,
-            height = 600 - margin;
+            "use strict";
+            var margin = 75,
+                width = 1400 - margin,
+                height = 600 - margin;
 
-        var svg = d3.select("body")
-            .append("svg")
-            .attr("width", width + margin)
-            .attr("height", height + margin)
-            .append('g')
-            .attr('class', 'map');
+            var svg = d3.select("body")
+                .append("svg")
+                .attr("width", width + margin)
+                .attr("height", height + margin)
+                .append('g')
+                .attr('class', 'map');
 
-        //project longitude and latitude data onto an albers USA pixel projection
-        var projection = d3.geo.albersUsa()
-                               .scale(1000)
-                               .translate( [width / 2, height / 1.6]);
+            //project longitude and latitude data onto an albers USA pixel projection
+            var projection = d3.geo.albersUsa()
+                                   .scale(1000)
+                                   .translate( [width / 2, height / 1.6]);
 
-        //create the svg objects to render the pixels
-        var path = d3.geo.path().projection(projection);
+            //create the svg objects to render the pixels
+            var path = d3.geo.path().projection(projection);
 
-        //draw the map
-        var map = svg.selectAll('path')//select all the paths in svg
-                     .data(geo_data.features)//bind our geojson data to the empty selection (features contains an array of state coordinates)
-                     .enter()//select all the state paths that are not on the page
-                     .append('path')//append a path to the svg
-                     .attr('d', path)//with d property set to the path object created above
-                     .style('fill', 'rgb(9, 157, 217)')//
-                     .style('stroke', 'black')
-                     .style('stroke-width', 0.5);
+            //draw the map
+            var map = svg.selectAll('path')//select all the paths in svg
+                         .data(geo_data.features)//bind our geojson data to the empty selection (features contains an array of state coordinates)
+                         .enter()//select all the state paths that are not on the page
+                         .append('path')//append a path to the svg
+                         .attr('d', path)//with d property set to the path object created above
+                         .style('fill', 'rgb(9, 157, 217)')//
+                         .style('stroke', 'black')
+                         .style('stroke-width', 0.5);
+            
 
-        var bubbles = svg.append("g")
-                      .attr("class", "bubble")
-                      .selectAll("circle")
-                      .data(geo_data.features)
-                      .enter()
-                      .append("circle")
-                      .attr("transform", function(d) { 
-                          return "translate(" + path.centroid(d) + ")"; 
-                        })
-                      .attr("r", 1.5);
+            
+            function plot_bubbles(loan_data){
+            //debugger;  
+            //console.table(loan_data.slice(0,10));
+              //plot data
+              /*
+                var nested = d3.nest()
+                                //the .key function is used for grouping data using 
+                                //an accessor call-back function                
+                                .key(function(d) {
+                                  //debugger;
+                                  return d.state;
+                                })
+                                //the .rollup function is used to aggregate (e.g. sum) 
+                                //the grouped data
+                                .rollup(function(leaves){
+                                  //debugger;
+                                    var total = d3.sum(leaves, function(d){
+                                      return d.loan;
+                                    });
+                                    return {
+                                      'total_loans': total
+                                    };
+                                })
+                                .entries(loan_data);
+                                debugger;
+               */                
+                //location of bubbles
+                var bubbles = svg.append("g")
+                                  .attr("class", "bubble")
+                                  .selectAll("circle")
+                                  .data(geo_data.features)
+                                  .enter()
+                                  .append("circle")
+                                  .attr("transform", function(d) { 
+                                      return "translate(" + path.centroid(d) + ")"; 
+                                    })
+                                  .attr("r", 1.5);
+
+                //use population data to normalize total loans to loans per capita
+                //var population
+
+            };
+				
+
+            //var format = d3.time.format("%Y-%m-%d %H:%M");
+            //loading csv data:  http://learnjsdata.com/read_data.html
+            d3.csv("data/prosperLoanData.csv", 
+              function(data){
+                return {
+                  state: data.BorrowerState,
+                  loan: +data.LoanOriginalAmount
+                };
+              }, plot_bubbles);
+
+            /*
+            d3.csv("data/prosperLoanData.csv", function(data){
+              data["LoanOriginalAmount"] = +data["LoanOriginalAmount"];
+              return data;
+            }, plot_bubbles);
+*/
+        
+
+
       };
       </script>
   </head>
@@ -56,6 +111,7 @@
     Use D3 to load the GeoJSON file
     */
 d3.json("data/us_state.json", draw);
+
   </script>
 </body>
 </html>
