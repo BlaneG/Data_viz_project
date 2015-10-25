@@ -4,6 +4,18 @@
   <meta charset="utf-8">
   <script src="http://d3js.org/d3.v3.min.js"></script>
     <style>
+
+    .bubble {
+      fill: brown;
+      fill-opacity: .5;
+      stroke: #fff;
+      stroke-width: .5px;
+    }
+
+    .bubble :hover {
+      stroke: #000;
+    }
+
     </style>
     <script type="text/javascript">  
 
@@ -20,6 +32,14 @@
                 .append('g')
                 .attr('class', 'map');
 
+            svg.append("text")
+                    .attr("x", (width / 2))             
+                    .attr("y", margin)
+                    .attr("text-anchor", "middle")  
+                    .style("font-size", "16px") 
+                    //.style("text-decoration", "bold")  
+                    .text("Cumulative Prosper Loans Distributed by State");
+
             //project longitude and latitude data onto an albers USA pixel projection
             var projection = d3.geo.albersUsa()
                                    .scale(1000)
@@ -34,9 +54,11 @@
                          .enter()//select all the state paths that are not on the page
                          .append('path')//append a path to the svg
                          .attr('d', path)//with d property set to the path object created above
-                         .style('fill', 'rgb(9, 157, 217)')//
+                         .style('fill', '#ddd')//
                          .style('stroke', 'black')
                          .style('stroke-width', 0.5);
+
+
 
             function plot_bubbles(loan_data){
                 
@@ -78,26 +100,36 @@
 
                 var radius = d3.scale.sqrt()
                     .domain([0, max_loans]) //1e8 is the magnitude of the largest totalLoanAmount aggregated for a state
-                    .range([0, 25]);   
+                    .range([0, 25]);  
 
-                function key_func(d){
+                var formatNumber = d3.format(",.0f"); 
+
+                function key_state_abrrev(d){
                     return d.properties.STUSPS;
                 }
 
-                //location of bubbles
+                function key_state(d){
+                    return d.properties.NAME
+                }
+
+                //add bubbles
                 svg.append("g")
-                    .attr("class", "bubble")
+                      .attr("class", "bubble")
                     .selectAll("circle")
-                    .data(geo_data.features)
-                    .enter()
-                    .append("circle")
-                    .attr("transform", function(d) { 
-                        return "translate(" + path.centroid(d) + ")"; 
+                      .data(geo_data.features)
+                    .enter().append("circle")
+                      .attr("transform", function(d) { 
+                          return "translate(" + path.centroid(d) + ")"; 
+                        })
+                      .attr("r", function(d){
+                          return radius(get_totalLoan(key_state_abrrev(d)));
                       })
-                    .attr("r", function(d){
-                    debugger;
-                        return radius(get_totalLoan(key_func(d)));
-                    })
+                    .append("title")
+                      .text(function(d){
+                        return key_state(d)
+                          + "\nCumulative Loans Distributed:\n" 
+                          + "$" + formatNumber(get_totalLoan(key_state_abrrev(d)));
+                      })                    
 
 
 
