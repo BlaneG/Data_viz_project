@@ -36,8 +36,8 @@
                     .attr("x", (width / 2))             
                     .attr("y", margin)
                     .attr("text-anchor", "middle")  
-                    .style("font-size", "16px") 
-                    //.style("text-decoration", "bold")  
+                    .style("font-size", "24px") 
+                    .style("font-weight", "bold")  
                     .text("Cumulative Prosper Loans Distributed by State");
 
             //project longitude and latitude data onto an albers USA pixel projection
@@ -131,63 +131,6 @@
                           + "$" + formatNumber(get_totalLoan(key_state_abrrev(d)));
                       })                    
 
-
-
-/*
-                var cumulativeLoanAmountByState = d3.nest()
-                                //the .key function is used for grouping data using 
-                                //an accessor call-back function                
-                                .key(function(d) {
-                                  //debugger;
-                                  return d.state;
-                                })
-                                //the .rollup function is used to aggregate (e.g. sum) 
-                                //the grouped data
-                                .rollup(function(leaves){
-                                  //debugger;
-                                    var total = d3.sum(leaves, function(d){
-                                      return d.loan;
-                                    });
-                                    return {
-                                      'totalLoans': total
-                                    };
-                                })
-                                .entries(loan_data);                    
-*/
-
-
-
-
-                /*
-                var bubbles = svg.append("g")
-                                  .attr("class", "bubble")
-                                  .selectAll("circle")
-                                  .data(geo_data.features)
-                                  .enter()
-                                  .append("circle")
-                                  .attr("transform", function(d) { 
-                                      return "translate(" + path.centroid(d) + ")"; 
-                                    })
-                                  .attr("r", 1.5);
-
-                //var radius = svg.append()
-                */
-                /*
-                function(d){
-                                  
-                                    for(i=0; i<cumulativeLoanAmountByState.state.length; i++) {
-                                        if (d["properties"]["STUSPS"] == cumulativeLoanAmountByState[i]["key"]) {
-                                            return cumulativeLoanAmountByState[i]["total_loans"];
-                                        };
-                                    
-                                      
-                                    }
-                                  })
-                */
-                         
-                //use population data to normalize total loans to loans per capita
-                //var population
-
             };
 				
 
@@ -200,15 +143,7 @@
                   loan: +data.LoanOriginalAmount
                 };
               }, plot_bubbles);
-
-            /*
-            d3.csv("data/prosperLoanData.csv", function(data){
-              data["LoanOriginalAmount"] = +data["LoanOriginalAmount"];
-              return data;
-            }, plot_bubbles);
-            */
         
-
 
       };
     </script>
