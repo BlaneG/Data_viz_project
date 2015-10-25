@@ -6,6 +6,7 @@
     <style>
     </style>
     <script type="text/javascript">  
+
       function draw(geo_data) {
             "use strict";
             var margin = 75,
@@ -36,15 +37,72 @@
                          .style('fill', 'rgb(9, 157, 217)')//
                          .style('stroke', 'black')
                          .style('stroke-width', 0.5);
-            
 
-            
             function plot_bubbles(loan_data){
-            //debugger;  
-            //console.table(loan_data.slice(0,10));
-              //plot data
-              
-                var totalLoanAmountByState = d3.nest()
+                
+                function aggregateLoans(leaves){
+                    //debugger;
+                    var total = d3.sum(leaves, function(d){
+                        return d.loan;
+                    });
+                    return {
+                        'totalLoans': total
+                    };
+                }
+
+                var cumulativeLoanAmountByState = d3.nest()
+                                //the .key function is used for grouping data using 
+                                //an accessor call-back function                
+                                .key(function(d) {
+                                  //debugger;
+                                  return d.state;
+                                })
+                                //the .rollup function is used to aggregate (e.g. sum) 
+                                //the grouped data
+                                .rollup(aggregateLoans)
+                                .entries(loan_data);
+
+                //determine totalLoan amount for each state                  
+                function get_totalLoan(state){
+                    for(var i=0; i<cumulativeLoanAmountByState.length; i++){
+                      if (state == cumulativeLoanAmountByState[i]["key"]){
+                        return cumulativeLoanAmountByState[i]["values"]["totalLoans"];
+                      }
+                    }
+                }
+
+                //update function for max totalLoans                  
+                var max_loans = d3.max(cumulativeLoanAmountByState, function(d) {
+                                return d.values['totalLoans'];
+                            });
+
+                var radius = d3.scale.sqrt()
+                    .domain([0, max_loans]) //1e8 is the magnitude of the largest totalLoanAmount aggregated for a state
+                    .range([0, 25]);   
+
+                function key_func(d){
+                    return d.properties.STUSPS;
+                }
+
+                //location of bubbles
+                svg.append("g")
+                    .attr("class", "bubble")
+                    .selectAll("circle")
+                    .data(geo_data.features)
+                    .enter()
+                    .append("circle")
+                    .attr("transform", function(d) { 
+                        return "translate(" + path.centroid(d) + ")"; 
+                      })
+                    .attr("r", function(d){
+                    debugger;
+                        return radius(get_totalLoan(key_func(d)));
+                    })
+
+
+
+/*
+                var cumulativeLoanAmountByState = d3.nest()
                                 //the .key function is used for grouping data using 
                                 //an accessor call-back function                
                                 .key(function(d) {
@@ -59,13 +117,16 @@
                                       return d.loan;
                                     });
                                     return {
-                                      'total_loans': total
+                                      'totalLoans': total
                                     };
                                 })
-                                .entries(loan_data);
-                                
-                               
-                //location of bubbles
+                                .entries(loan_data);                    
+*/
+
+
+
+
+                /*
                 var bubbles = svg.append("g")
                                   .attr("class", "bubble")
                                   .selectAll("circle")
@@ -77,6 +138,21 @@
                                     })
                                   .attr("r", 1.5);
 
+                //var radius = svg.append()
+                */
+                /*
+                function(d){
+                                  
+                                    for(i=0; i<cumulativeLoanAmountByState.state.length; i++) {
+                                        if (d["properties"]["STUSPS"] == cumulativeLoanAmountByState[i]["key"]) {
+                                            return cumulativeLoanAmountByState[i]["total_loans"];
+                                        };
+                                    
+                                      
+                                    }
+                                  })
+                */
+                         
                 //use population data to normalize total loans to loans per capita
                 //var population
 
@@ -98,13 +174,13 @@
               data["LoanOriginalAmount"] = +data["LoanOriginalAmount"];
               return data;
             }, plot_bubbles);
-*/
+            */
         
 
 
       };
-      </script>
-  </head>
+    </script>
+</head>
 <body>
   <script type="text/javascript">
   /*
