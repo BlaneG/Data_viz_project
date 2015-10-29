@@ -129,7 +129,9 @@
                       .data(cumulativeLoanAmountByState)
                     .enter().append("circle")
                       .attr("r", function(d){
+                        if(d.key!==""){
                           return radius(d.values.totalLoans);
+                        }
                       })
                       .attr("transform", function(d){
                           for(var i=0; i<geo_data.features.length; i++){
