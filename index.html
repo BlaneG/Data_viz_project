@@ -83,6 +83,7 @@
                                 //the grouped data
                                 .rollup(aggregateLoans)
                                 .entries(loan_data)
+                                //sort objects based on the totalLoans distributed in each state
                                 .sort(function(a,b){
                                   if(a.values.totalLoans>b.values.totalLoans){
                                     return -1;

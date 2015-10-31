@@ -1,6 +1,7 @@
 d3 projections - https://github.com/mbostock/d3/wiki/Geo-Projections
 pie layout - https://github.com/mbostock/d3/wiki/Pie-Layout
 US shapefiles - http://www.census.gov/geo/maps-data/data/tiger-cart-boundary.html
+Converting shapefile to geoJSON - http://ogre.adc4gis.com/
 Let's make a bubble map - http://bost.ocks.org/mike/bubble-map/
 Understanding geopaths - https://github.com/mbostock/d3/wiki/Geo-Paths
 D3 nest tutorial - http://bl.ocks.org/phoebebright/raw/3176159/
