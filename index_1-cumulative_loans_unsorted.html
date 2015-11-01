@@ -91,7 +91,7 @@
                             });
 
                 var radius = d3.scale.sqrt()
-                    .domain([0, max_loans]) //1e8 is the magnitude of the largest totalLoanAmount aggregated for a state
+                    .domain([0, max_loans]) 
                     .range([0, 35]);  
 
                 var formatNumber = d3.format(",.0f"); 
@@ -123,8 +123,6 @@
                       })   
             };
 				
-
-            //var format = d3.time.format("%Y-%m-%d %H:%M");
             //loading csv data:  http://learnjsdata.com/read_data.html
             d3.csv("data/prosperLoanData.csv", 
               function(data){
@@ -134,7 +132,6 @@
                 };
               }, plot_bubbles);
         
-
       };
     </script>
 </head>

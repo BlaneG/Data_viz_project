@@ -63,7 +63,6 @@
             function plot_bubbles(loan_data){
                 
                 function aggregateLoans(leaves){
-                    //debugger;
                     var total = d3.sum(leaves, function(d){
                         return d.loan;
                     });
@@ -76,7 +75,6 @@
                                 //the .key function is used for grouping data using 
                                 //an accessor call-back function                
                                 .key(function(d) {
-                                  //debugger;
                                   return d.state;
                                 })
                                 //the .rollup function is used to aggregate (e.g. sum) 
@@ -93,7 +91,6 @@
                                   }
                                   return 0;
                                 });
-
 
                 //update function for max totalLoans                  
                 var max_loans = d3.max(cumulativeLoanAmountByState, function(d) {
