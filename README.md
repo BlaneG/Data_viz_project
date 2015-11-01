@@ -18,8 +18,10 @@ The aim of this visualization was to explore the cumulative, value of loans dist
 Feedback from early iterations for the visualization that were incorporated in the final project included:
 
 1) Move the smallest data points to the front of the map so overlapping large bubbles don't obscure smaller bubbles
+
 2) Scale the total loan value to per capita total loan value for each state so we can see the difference in per capita loan value for each state.
-3) Add another variable to the plot
+
+3) Add another variable to the plot.
 
 ##Resources
 The following resources we used to implement the visualizations for this project:
