@@ -93,15 +93,6 @@
                                   return 0;
                                 });
 
-                //determine totalLoan amount for each state                  
-                function get_totalLoan(state){
-                    for(var i=0; i<cumulativeLoanAmountByState.length; i++){
-                      if (state == cumulativeLoanAmountByState[i]["key"]){
-                        return cumulativeLoanAmountByState[i]["values"]["totalLoans"];
-                      }
-                    }
-                }
-
                 //update function for max totalLoans                  
                 var max_loans = d3.max(cumulativeLoanAmountByState, function(d) {
                                 return d.values['totalLoans'];
