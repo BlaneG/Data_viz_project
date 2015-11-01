@@ -83,18 +83,8 @@
                                 //the grouped data
                                 .rollup(aggregateLoans)
                                 .entries(loan_data)
-                                //sort objects based on the totalLoans distributed in each state
-                                .sort(function(a,b){
-                                  if(a.values.totalLoans>b.values.totalLoans){
-                                    return -1;
-                                  }
-                                  if(a.values.totalLoans<b.values.totalLoans){
-                                    return 1;
-                                  }
-                                  return 0;
-                                });
 
-
+                debugger;
                 //update function for max totalLoans                  
                 var max_loans = d3.max(cumulativeLoanAmountByState, function(d) {
                                 return d.values['totalLoans'];
@@ -107,7 +97,7 @@
                 var formatNumber = d3.format(",.0f"); 
 
 
-                //add bubbles       
+                //add bubbles           
                 svg.append("g")
                       .attr("class", "bubble")
                     .selectAll("circle")
@@ -133,6 +123,8 @@
                       })   
             };
 				
+
+            //var format = d3.time.format("%Y-%m-%d %H:%M");
             //loading csv data:  http://learnjsdata.com/read_data.html
             d3.csv("data/prosperLoanData.csv", 
               function(data){
@@ -142,6 +134,7 @@
                 };
               }, plot_bubbles);
         
+
       };
     </script>
 </head>
