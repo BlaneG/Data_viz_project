@@ -82,60 +82,46 @@
                                 //the .rollup function is used to aggregate (e.g. sum) 
                                 //the grouped data
                                 .rollup(aggregateLoans)
-                                .entries(loan_data);
+                                .entries(loan_data)
 
-
+                debugger;
                 //update function for max totalLoans                  
                 var max_loans = d3.max(cumulativeLoanAmountByState, function(d) {
                                 return d.values['totalLoans'];
                             });
 
                 var radius = d3.scale.sqrt()
-                    .domain([0, max_loans]) //1e8 is the magnitude of the largest totalLoanAmount aggregated for a state
-                    .range([0, 25]);  
+                    .domain([0, max_loans]) 
+                    .range([0, 35]);  
 
                 var formatNumber = d3.format(",.0f"); 
 
-                //determine totalLoan amount for each state                  
-                function get_totalLoan(state){
-                    for(var i=0; i<cumulativeLoanAmountByState.length; i++){
-                      if (state == cumulativeLoanAmountByState[i]["key"]){
-                        return cumulativeLoanAmountByState[i]["values"]["totalLoans"];
-                      }
-                    }
-                }
-
-                function key_state_abrrev(d){
-                    return d.properties.STUSPS;
-                }
-
-                function key_state(d){
-                    return d.properties.NAME
-                }
-
-                //add bubbles
+                //add bubbles           
                 svg.append("g")
                       .attr("class", "bubble")
                     .selectAll("circle")
-                      .data(geo_data.features)
+                      .data(cumulativeLoanAmountByState)
                     .enter().append("circle")
-                      .attr("transform", function(d) { 
-                          return "translate(" + path.centroid(d) + ")"; 
-                        })
                       .attr("r", function(d){
-                          return radius(get_totalLoan(key_state_abrrev(d)));
+                        if(d.key!==""){
+                          return radius(d.values.totalLoans);
+                        }
+                      })
+                      .attr("transform", function(d){
+                          for(var i=0; i<geo_data.features.length; i++){
+                            if(geo_data.features[i].properties.STUSPS==d.key){
+                              return "translate(" + path.centroid(geo_data.features[i]) + ")";
+                            }
+                          }
                       })
                     .append("title")
                       .text(function(d){
-                        return key_state(d)
+                        return d.key
                           + "\nCumulative Loans Distributed:\n" 
-                          + "$" + formatNumber(get_totalLoan(key_state_abrrev(d)));
-                      })                    
-
+                          + "$" + formatNumber(d.values.totalLoans);
+                      })   
             };
 				
-
-            //var format = d3.time.format("%Y-%m-%d %H:%M");
             //loading csv data:  http://learnjsdata.com/read_data.html
             d3.csv("data/prosperLoanData.csv", 
               function(data){
@@ -145,7 +131,6 @@
                 };
               }, plot_bubbles);
         
-
       };
     </script>
 </head>
