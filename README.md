@@ -15,13 +15,15 @@ Prosper is a peer to peer lending operation that helps to connect individual bor
 The aim of this visualization was to explore the cumulative, value of loans distributed within each state - spanning the temporal bounds of the dataset (November 15th, 2005 - March 12th, 2014) - using a bubble plot.  One bubble is used with the area of the bubble equal to the square root of the cumulative loan amount.  When using bubbles, it is important to scale the size of the bubble to the square root of the parameter you are plotting because the radius is used to format bubble size, and the area of a circle is proportional to it's radius<sup>2</sup>.  The transparency of each bubble is set to 50% in order to add some emphasis to overlapping data.  A textbox can be activated for each bubble to display the state and cumulative loan amount for that state by hovering the over each bubble with the mouse.
 
 ##Feedback
-Feedback from early iterations for the visualization that were incorporated in the final project included:
+Feedback from early iterations incorprated into the visualization included:
 
-1) Move the smallest data points to the front of the map so overlapping large bubbles don't obscure smaller bubbles
+1) Layer the smallest bubble plots on top so overlapping large bubbles don't obscure smaller bubbles
 
 2) Scale the total loan value to per capita total loan value for each state so we can see the difference in per capita loan value for each state.
 
-3) Add another variable to the plot.
+3) Adding a bar chart below map to illustrate differences in cumulative per capita loans distributed by state.
+
+4) Add another variable to the plot.
 
 ##Resources
 The following resources we used to implement the visualizations for this project:
