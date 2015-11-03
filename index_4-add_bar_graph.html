@@ -23,7 +23,7 @@
     }
 
     .bar text.value {
-      fill: white;
+      fill: black;
     }
 
     .axis {
@@ -119,6 +119,12 @@
                                     .rollup(aggregateLoans)
                                     .entries(prosperLoanData)
 
+                    //remove stateless people
+                    for(var i=0; i<loanData.length;i++){
+                        if(loanData[i].key==""){
+                          loanData.splice(i,1);
+                        }
+                    }
 
 
 
@@ -152,7 +158,6 @@
                                 return 0;
                               });
 
-                debugger;
 
                 //get max for setting domain of radius                 
                 var max_loans = d3.max(loanData, function(d) {
@@ -174,11 +179,7 @@
                     .selectAll("circle")
                       .data(loanData)
                     .enter().append("circle")
-                      .attr("r", function(d){
-                        if(d.key!==""){
-                          return radius(d.values.perCapitaLoan);
-                        }
-                      })
+                      .attr("r", function(d){return radius(d.values.perCapitaLoan);})
                       .attr("transform", function(d){
                           for(var i=0; i<geo_data.features.length; i++){
                             if(geo_data.features[i].properties.STUSPS==d.key){
@@ -196,12 +197,12 @@
                 function plot_chart(){
                     //guided by http://bl.ocks.org/mbostock/1389927#index.html
                     //set margins http://bl.ocks.org/mbostock/3019563
-                    var margin = {top: 30, right: 10, left: 10, bottom: 30},
+                    var margin = {top: 30, right: 20, left: 30, bottom: 30},
                         width = 500 - margin.right - margin.left,
                         bar_width = 20,
-                        height = bar_width*loanData.length + 2*margin.top - margin.top - margin.bottom;
+                        height = bar_width*loanData.length - margin.top - margin.bottom;
 
-                    var bar_format = d3.format(",.0f");
+                    var bar_format = d3.format("$,.2f");
 
                     var x = d3.scale.linear().range([0, width]),
                         y = d3.scale.ordinal().rangeRoundBands([0, height], .1);
@@ -216,8 +217,7 @@
                                   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
                     x.domain([0, max_perCapitaloans]);
-                    y.domain(loanData.map(function(d) { return d.key; }));
-
+                    y.domain(loanData.map(function(d) {return d.key;}));
 
                     var bar = svg.selectAll("g.bar")
                                     .data(loanData)
@@ -226,17 +226,25 @@
                                     .attr("transform", function(d) { return "translate(0," + y(d.key) + ")"; });
 
                     bar.append("rect")
-                        .attr("width", function(d) { return x(d.values.perCapitaLoan); })
+                        .attr("width", function(d) { if(d.key!==""){
+                            return x(d.values.perCapitaLoan);
+                            };
+                        })
                         .attr("height", y.rangeBand());
 
                     bar.append("text")
                         .attr("class", "value")
-                        .attr("x", function(d) { return x(d.values.perCapitaLoan); })
+                        .attr("x", function(d) { if(d.key!==""){
+                            return x(d.values.perCapitaLoan);
+                            };
+                        })
                         .attr("y", y.rangeBand() / 2)
-                        .attr("dx", -3)
+                        .attr("dx", 20)
                         .attr("dy", ".35em")
                         .attr("text-anchor", "end")
-                        .text(function(d) { return format(d.values.perCapitaLoan); });
+                        .text(function(d) { if(d.key!==""){
+                            return bar_format(d.values.perCapitaLoan);
+                            }; });
 
                     svg.append("g")
                         .attr("class", "x axis")
@@ -245,8 +253,7 @@
                       svg.append("g")
                           .attr("class", "y axis")
                           .call(yAxis);
-                          
-                    
+  
                 }
 
                 plot_chart()
