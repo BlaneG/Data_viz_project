@@ -294,6 +294,7 @@
                         .append("text")
                         .attr("transform", "translate(" + width/2 + ",-20)")
                         .style("text-anchor", "middle")
+                        .style("font-weight", "bold") 
                         .text("Percapita loans distributed over a 10 year period");
                     //adding the y axis
                     svg.append("g")
@@ -301,6 +302,7 @@
                         .call(yAxis)
                         .append("text")
                         .attr("text-anchor", "middle")
+                        .style("font-weight", "bold") 
                         .attr("transform", "translate(-35,"+height/2+")rotate(-90)")
                         .text("State");
   
