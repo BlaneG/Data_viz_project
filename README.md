@@ -4,13 +4,6 @@ This visualization explores the cumulative, per capita loans distributed for eac
 
 This data viz project was developed for completion of Udacity's data visualization course.  The dataset is made available by [Prosper](https://www.prosper.com/) and includes 81 variables (e.g. loan amount, interest rate, etc.) for over 100,000 peer-to-peer loans in the US.   
 
-####Next steps:
-
-* - [ ] convert bubble to pie charts for each state 
-    * - [ ] size of pie chart represents total LoanOriginalAmount by state
-    * - [ ] pie slices representing the fraction of LoanOriginalAmount by CreditGrade
-* - [ ] Make the map a chloropleth representing DebtToIncomeRatio
-
 ##Design
 
 The aim of this visualization was to explore the cumulative, value of loans distributed within each state - spanning the temporal bounds of the dataset (November 15th, 2005 - March 12th, 2014).  A map was used to illustrate geographic differences in per capita loan distributions while a bar chart clarifies differences in the magnitude of per capita loans distributed to each state which are more difficult to grasp from the bubble plot alone.  The area of each bubble is scaled to the square root of the cumulative, per capita loans distributed to residents of each state.  When using bubbles, it is important to scale the size of the bubble to the square root of the parameter you are plotting because the radius is used to format bubble size, and the area of a circle is proportional to it's radius<sup>2</sup>.  The transparency of each bubble is set to 50% which adds some emphasis to overlapping data.  By hovering over each bubble with the mouse, a textbox can is activated displaying the cumulative, per capita loan amount distributed within the state.
@@ -30,20 +23,23 @@ The following resources we used to implement the visualizations for this project
 
 * Maps:
 
-- Responsive maps with D3 - http://eyeseast.github.io/visible-data/2013/08/26/responsive-d3/
-- US shapefiles - http://www.census.gov/geo/maps-data/data/tiger-cart-boundary.html
-- Converting shapefile to geoJSON - http://ogre.adc4gis.com/
-- Let's make a bubble map - http://bost.ocks.org/mike/bubble-map/
-- Understanding geopaths - https://github.com/mbostock/d3/wiki/Geo-Paths
-- d3 geo projections - https://github.com/mbostock/d3/wiki/Geo-Projections
+   - Responsive maps with D3 - http://eyeseast.github.io/visible-data/2013/08/26/responsive-d3/
+   - US shapefiles - http://www.census.gov/geo/maps-data/data/tiger-cart-boundary.html
+   - Converting shapefile to geoJSON - http://ogre.adc4gis.com/
+   - Let's make a bubble map - http://bost.ocks.org/mike/bubble-map/
+   - Understanding geopaths - https://github.com/mbostock/d3/wiki/Geo-Paths
+   - d3 geo projections - https://github.com/mbostock/d3/wiki/Geo-Projections
 
 * Charting:
 
-- responsive charts with D3 - http://eyeseast.github.io/visible-data/2013/08/28/responsive-charts-with-d3/
-- a bar chart - http://bl.ocks.org/mbostock/1389927#index.html
+   - responsive charts with D3 - http://eyeseast.github.io/visible-data/2013/08/28/responsive-charts-with-d3/
+   - a bar chart - http://bl.ocks.org/mbostock/1389927#index.html
+
+* Legends:
+   - http://d3-legend.susielu.com/
 
 * Data wrangling:
 
-- D3 nest tutorial - http://bl.ocks.org/phoebebright/raw/3176159/
-- Sorting objects, arrays, etc. in Javascript - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
-- Formatting numbers - http://bl.ocks.org/zanarmstrong/05c1e95bf7aa16c4768e
+   - D3 nest tutorial - http://bl.ocks.org/phoebebright/raw/3176159/
+   - Sorting objects, arrays, etc. in Javascript - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
+   - Formatting numbers - http://bl.ocks.org/zanarmstrong/05c1e95bf7aa16c4768e
