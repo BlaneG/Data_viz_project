@@ -4,12 +4,14 @@
   <meta charset="utf-8">
   <script src="http://d3js.org/d3.v3.min.js"></script>
   <script src="http://d3js.org/queue.v1.min.js"></script>
+
+  
     <style>
     .bubble {
-      fill: brown;
+      fill: #f7f7f7;
       fill-opacity: .5;
       stroke: #fff;
-      stroke-width: .5px;
+      stroke-width: 0.25px;
     }
 
     .bubble :hover {
@@ -17,7 +19,7 @@
     }
 
     .bar rect {
-      fill: brown;
+      fill: #f7f7f7;
       fill-opacity: 0.5;
     }
 
@@ -45,7 +47,8 @@
     <script type="text/javascript">  
 
       function draw(geo_data) {
-            "use strict";
+
+
             var margin = 75,
                 width = 1400 - margin,
                 height = 600 - margin;
@@ -63,7 +66,7 @@
                     .attr("text-anchor", "middle")  
                     .style("font-size", "20px") 
                     .style("font-weight", "bold")  
-                    .text("Cumulative, per capita, loans distributed to residents of each state using Prosper from 2005-11 to 2015-03");
+                    .text("State by state differences in cumulative, per capita, \n loans distributed to residents of each state using Prosper from 2005-11 to 2015-03");
 
             //project longitude and latitude data onto an albers USA pixel projection
             var projection = d3.geo.albersUsa()
@@ -90,7 +93,7 @@
               This function is used to plot the bubbles on the map
               */
 
-                function combine_data(error, prosperLoanData, population){
+                function combine_data(){
                   /*
                   This function is using for combinding the prosper loan data with
                   population data by state
@@ -156,7 +159,14 @@
                                 }
                                 return 0;
                               });
+                var loansArray = [];
+                for(var i=0; i<loanData.length; i++){
+                  loansArray.push(loanData[i].values.perCapitaLoan);
+                }
 
+                //calculate 1st and 3rd quartile
+                var percentile25 = d3.quantile(loansArray, 0.75),
+                    percentile75 = d3.quantile(loansArray, 0.25);
 
                 //get max for setting domain of radius                 
                 var max_loans = d3.max(loanData, function(d) {
@@ -168,7 +178,7 @@
 
                 var radius = d3.scale.sqrt()
                     .domain([0, max_perCapitaloans]) //1e8 is the magnitude of the largest totalLoanAmount aggregated for a state
-                    .range([0, 25]);  
+                    .range([0, 15]);  
 
                 var formatNumber = d3.format("$,.2f"); 
 
@@ -179,6 +189,11 @@
                       .data(loanData)
                     .enter().append("circle")
                       .attr("r", function(d){return radius(d.values.perCapitaLoan);})
+                      //adjust the style using for loops http://www.d3noob.org/2013/01/select-items-with-if-statement-in-d3js.html
+                      .style("fill", function(d){
+                          if(d.values.perCapitaLoan<percentile25){return "#67a9cf";}
+                          if(d.values.perCapitaLoan>percentile75){return "#ef8a62";}
+                      })
                       .attr("transform", function(d){
                           for(var i=0; i<geo_data.features.length; i++){
                             if(geo_data.features[i].properties.STUSPS==d.key){
@@ -194,8 +209,10 @@
                       })   
 
                 function plot_chart(){
+                    //this function creates the bar chart
                     //guided by http://bl.ocks.org/mbostock/1389927#index.html
-                    //set margins http://bl.ocks.org/mbostock/3019563
+                    
+                    //setting the margins margins http://bl.ocks.org/mbostock/3019563
                     var margin = {top: 30, right: 20, left: 30, bottom: 30},
                         width = 500 - margin.right - margin.left,
                         bar_width = 20,
@@ -203,63 +220,68 @@
 
                     var bar_format = d3.format("$,.2f");
 
+                    //scaling the axes
                     var x = d3.scale.linear().range([0, width]),
                         y = d3.scale.ordinal().rangeRoundBands([0, height], .1);
 
+                    //formatting the axes
                     var xAxis = d3.svg.axis().scale(x).orient("top").tickSize(-height),
                         yAxis = d3.svg.axis().scale(y).orient("left").tickSize(0);
 
+                    //creating the svg container
                     var svg = d3.select("body").append("svg")
                                   .attr("width", width + margin.left + margin.right)
                                   .attr("height", height + margin.top + margin.bottom)
                                 .append("g")
                                   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+                    //setting the x and y domain
                     x.domain([0, max_perCapitaloans]);
                     y.domain(loanData.map(function(d) {return d.key;}));
 
+                    //create a container for each bar
                     var bar = svg.selectAll("g.bar")
                                     .data(loanData)
                                   .enter().append("g")
                                     .attr("class", "bar")
                                     .attr("transform", function(d) { return "translate(0," + y(d.key) + ")"; });
 
+                    //set the dimensions of each bar
                     bar.append("rect")
-                        .attr("width", function(d) { if(d.key!==""){
-                            return x(d.values.perCapitaLoan);
-                            };
-                        })
-                        .attr("height", y.rangeBand());
+                        .attr("width", function(d) { return x(d.values.perCapitaLoan);})
+                        .attr("height", y.rangeBand())
+                         //adjust the style using for loops http://www.d3noob.org/2013/01/select-items-with-if-statement-in-d3js.html
+                        .style("fill", function(d){
+                            if(d.values.perCapitaLoan<percentile25){return "#67a9cf";}
+                            if(d.values.perCapitaLoan>percentile75){return "#ef8a62";}
+                        });
 
+                    //adding text of values to the end of each bar
                     bar.append("text")
                         .attr("class", "value")
-                        .attr("x", function(d) { if(d.key!==""){
-                            return x(d.values.perCapitaLoan);
-                            };
-                        })
+                        .attr("x", function(d) { return x(d.values.perCapitaLoan);})
                         .attr("y", y.rangeBand() / 2)
                         .attr("dx", 20)
                         .attr("dy", ".35em")
                         .attr("text-anchor", "end")
-                        .text(function(d) { if(d.key!==""){
-                            return bar_format(d.values.perCapitaLoan);
-                            }; });
+                        .text(function(d) { return bar_format(d.values.perCapitaLoan);});
 
+                    //adding the x axis
                     svg.append("g")
                         .attr("class", "x axis")
                         .call(xAxis);
-
-                      svg.append("g")
-                          .attr("class", "y axis")
-                          .call(yAxis);
+                    //adding the y axis
+                    svg.append("g")
+                        .attr("class", "y axis")
+                        .call(yAxis);
   
                 }
-
+                //plot the chart
                 plot_chart()
 
             };
 				
-
+            //load additional data and then pass the plot_bubbles function
             queue()
               .defer(d3.csv, "data/prosperLoanData.csv", 
                   function(data){
