@@ -241,14 +241,42 @@
         }
 
 
-        var outliers = [{"state": "ND", "label": "North Dakota", "dx": 0, "dy": margin}, {"state": "IA", "label": "Iowa State", "dx": 20, "dy": 2*margin}, {"state": "ME", "label": "Maine", "dx": -margin, "dy": 0}, {"state": "DC", "label": "District of Columbia", "dx": margin, "dy":0}];
-
-        function labelOutliers(geo_data, perCapitaLoan){
-            //This function is used to highlight states that are outliers
-            debugger;
+        function locateCentroid(d){
+            for(var i=0; i<geo_data.features.length; i++){
+              if(geo_data.features[i].properties.STUSPS==d.state){
+                return "translate(" + path.centroid(geo_data.features[i]) + ")";
+              }
+            }
         }
 
-        labelOutliers()
+
+        function labelOutliers(geo_data, loanDataPerCapita){
+            //This function is used to highlight states that are outliers
+
+            //create an object of outliers
+            var outliers = [{"state": "ND", "label": "North Dakota", "dx": -25, "dy": -margin}, {"state": "IA", "label": "Iowa State", "dx": 20, "dy": -2*margin}, {"state": "ME", "label": "Maine", "dx": -margin, "dy": 0}, {"state": "DC", "label": "District of Columbia", "dx": margin, "dy":0}];
+            svg.append("g")
+              .attr("class", "state-label")
+              .selectAll("text")
+                .data(outliers)
+                .enter().append("text")
+                .attr("transform", function(d){
+                  return locateCentroid(d);
+                })
+                .attr("dx", function(d) {return d.dx; })
+                .attr("dy", function(d){return d.dy; })
+                .text(function(d){
+                  return d.label;
+                });
+
+
+
+
+
+
+        }
+
+        labelOutliers(geo_data, loanDataPerCapita)
         
     };
     </script>
