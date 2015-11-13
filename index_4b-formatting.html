@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script src="http://d3js.org/queue.v1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/1.5.0/d3-legend.min.js"></script>
+  
+    <style>
+    .bubble {
+      fill: #999999;
+      fill-opacity: .75;
+      stroke: #fff;
+      stroke-width: 0.25px;
+    }
+
+    .bubble :hover {
+      stroke: #000;
+    }
+
+    .bar rect {
+      fill: #999999;
+      fill-opacity: 0.75;
+      outline: .5px solid;
+    }
+
+    .bar text.value {
+      fill: black;
+    }
+
+    .axis {
+      shape-rendering: crispEdges;
+    }
+
+    .axis path {
+      fill: none;
+    }
+
+    .x.axis line {
+      stroke: #fff;
+      stroke-opacity: .8;
+    }
+
+    .y.axis path {
+      stroke: black;
+    }
+    </style>
+
+
+    <script type="text/javascript">  
+
+
+
+    function draw(error, geo_data, loanData, population) {
+        if (error) throw error;
+
+        var geo_data = geo_data,
+            loanData = loanData,
+            population = population;
+
+        var margin = 75,
+            width = 1400 - margin,
+            height = 600 - margin;
+
+        var svg = d3.select("body")
+            .append("svg")
+            .attr("width", width + margin)
+            .attr("height", height + margin)
+            .append('g')
+            .attr('class', 'map');
+
+        svg.append("text")
+                .attr("x", (width / 2))             
+                .attr("y", margin)
+                .attr("text-anchor", "middle")  
+                .style("font-size", "20px") 
+                .style("font-weight", "bold")  
+                .text("State by state differences in cumulative, per capita, \n loans distributed to residents of each state using Prosper from 2005-11 to 2015-03");
+
+        //project longitude and latitude data onto an albers USA pixel projection
+        var projection = d3.geo.albersUsa()
+                               .scale(1000)
+                               .translate( [width / 2, height / 1.6]);
+
+        //create the svg objects to render the pixels
+        var path = d3.geo.path().projection(projection);
+
+        //draw the map
+        var map = svg.selectAll('path')//select all the paths in svg
+                     .data(geo_data.features)//bind our geojson data to the empty selection (features contains an array of state coordinates)
+                     .enter()//select all the state paths that are not on the page
+                     .append('path')//append a path to the svg
+                     .attr('d', path)//with d property set to the path object created above
+                     .style('fill', '#ddd')//
+                     .style('stroke', 'black')
+                     .style('stroke-width', 0.5);
+
+        //add a legend for plot colors
+        //http://d3-legend.susielu.com/
+        var ordinal = d3.scale.ordinal()
+                .domain(["Upper quartile", "Inter-quartile range", "Lower quartile"])
+                .range([ "#ef8a62", "#999999", "#67a9cf"]);
+
+        svg.append("g")
+          .attr("class", "legendOrdinal")
+          .attr("transform", "translate(20,"+ height/2 + ")");
+
+        var legendOrdinal = d3.legend.color()
+          //d3 symbol creates a path-string, for example
+          //"M0,-8.059274488676564L9.306048591020996,
+          //8.059274488676564 -9.306048591020996,8.059274488676564Z"
+          .shape("path", d3.svg.symbol().type("circle").size(150)())
+          .shapePadding(10)
+          .scale(ordinal);
+
+        svg.select(".legendOrdinal")
+          .call(legendOrdinal);
+
+
+        function aggregateLoans(leaves){
+            //function for summing leaves in nested loanData
+            var total = d3.sum(leaves, function(d){
+                return d.loan;
+            });
+            return {
+                'cumulativeLoans': total
+            };
+        }
+
+        function updateLoanData(loanData, population){
+            //calculate perCapita cumulative loan amount by state
+            var data = loanData                     
+            for(var i=0; i<data.length; i++){
+                for(var j=0; j<population.length; j++){
+                    if(data[i].key==population[j].state){
+                        data[i].values.perCapitaLoan = data[i].values.cumulativeLoans/population[j].population;
+                    };
+                };
+            };
+            return data;                      
+        }
+
+        function aggregateData(loanData){
+          //This function is using for combinding the prosper loan data with
+          //population data by state
+          
+
+            var loanData = d3.nest()
+                            //the .key function is used for grouping data using 
+                            //an accessor call-back function                
+                            .key(function(d) {
+                              //debugger;
+                              return d.state;
+                            })
+                            //the .rollup function is used to aggregate (e.g. sum) 
+                            //the grouped data
+                            .rollup(aggregateLoans)
+                            .entries(loanData)
+
+            //remove stateless people
+            for(var i=0; i<loanData.length;i++){
+                if(loanData[i].key==""){
+                  loanData.splice(i,1);
+                }
+            }
+
+
+            //return the updated loanData object
+            return loanData;
+        }
+
+        function plot_bubbles(loanData, population){
+            //This function is used to plot the bubbles on the map
+                                 
+            //update cumulativeLoanAmountsort objects based on the cumulative Loans distributed in each state
+            var loanData = updateLoanData(aggregateData(loanData), population)
+
+            var loansArray = [];
+            for(var i=0; i<loanData.length; i++){
+              loansArray.push(loanData[i].values.perCapitaLoan);
+            }
+
+            //calculate 1st and 3rd quartile
+            var percentile25 = d3.quantile(loansArray, 0.75),
+                percentile75 = d3.quantile(loansArray, 0.25);
+
+            //get max for setting domain of radius                 
+            var max_loans = d3.max(loanData, function(d) {
+                            return d.values['cumulativeLoans'];
+                        });
+            var max_perCapitaloans = d3.max(loanData, function(d) {
+                            return d.values['perCapitaLoan'];
+                        });
+
+            var radius = d3.scale.sqrt()
+                .domain([0, max_perCapitaloans]) //1e8 is the magnitude of the largest totalLoanAmount aggregated for a state
+                .range([0, 15]);  
+
+            var formatNumber = d3.format("$,.2f"); 
+
+            //add bubbles to map    
+            svg.append("g")
+                  .attr("class", "bubble")
+                .selectAll("circle")
+                  .data(loanData)
+                .enter().append("circle")
+                  .attr("r", function(d){return radius(d.values.perCapitaLoan);})
+                  //adjust the style using for loops http://www.d3noob.org/2013/01/select-items-with-if-statement-in-d3js.html
+                  .style("fill", function(d){
+                      if(d.values.perCapitaLoan<percentile25){return "#67a9cf";}
+                      if(d.values.perCapitaLoan>percentile75){return "#ef8a62";}
+                  })
+                  .attr("transform", function(d){
+                      for(var i=0; i<geo_data.features.length; i++){
+                        if(geo_data.features[i].properties.STUSPS==d.key){
+                          return "translate(" + path.centroid(geo_data.features[i]) + ")";
+                        }
+                      }
+                  })
+                .append("title")
+                  .text(function(d){
+                    return d.key
+                      + "\n Per capita cumulative \n loans distributed in " + d.key + ":\n" 
+                      + formatNumber(d.values.perCapitaLoan);
+                  })   
+
+            function plot_chart(){
+                //this function creates the bar chart
+                //guided by http://bl.ocks.org/mbostock/1389927#index.html
+                
+                //setting the margins margins http://bl.ocks.org/mbostock/3019563
+                var margin = {top: 40, right: 20, left: 50, bottom: 30},
+                    width = 500 - margin.right - margin.left,
+                    bar_width = 20,
+                    height = bar_width*loanData.length - margin.top - margin.bottom;
+
+                var bar_format = d3.format("$,.2f");
+
+                //scaling the axes
+                var x = d3.scale.linear().range([0, width]),
+                    y = d3.scale.ordinal().rangeRoundBands([0, height], .1);
+
+                //formatting the axes
+                var xAxis = d3.svg.axis().scale(x).orient("top").tickSize(-height),
+                    yAxis = d3.svg.axis().scale(y).orient("left").tickSize(0);
+
+                //creating the svg container
+                var svg = d3.select("body").append("svg")
+                              .attr("width", width + margin.left + margin.right)
+                              .attr("height", height + margin.top + margin.bottom)
+                            .append("g")
+                              .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+                //setting the x and y domain
+                x.domain([0, max_perCapitaloans]);
+                y.domain(loanData.map(function(d) {return d.key;}));
+
+                //create a container for each bar
+                var bar = svg.selectAll("g.bar")
+                                .data(loanData)
+                              .enter().append("g")
+                                .attr("class", "bar")
+                                //locate each bar on the y-axis
+                                .attr("transform", function(d) { return "translate(0," + y(d.key) + ")"; });
+
+                //set the dimensions of each bar
+                bar.append("rect")
+                    .attr("width", function(d) { return x(d.values.perCapitaLoan);})
+                    .attr("height", y.rangeBand())
+                     //adjust the style using for loops http://www.d3noob.org/2013/01/select-items-with-if-statement-in-d3js.html
+                    .style("fill", function(d){
+                        if(d.values.perCapitaLoan<percentile25){return "#67a9cf";}
+                        if(d.values.perCapitaLoan>percentile75){return "#ef8a62";}
+                    });
+
+                //adding text of values to the end of each bar
+                bar.append("text")
+                    .attr("class", "value")
+                    .attr("x", function(d) { return x(d.values.perCapitaLoan);})
+                    .attr("y", y.rangeBand() / 2)
+                    .attr("dx", 20)
+                    .attr("dy", ".35em")
+                    .attr("text-anchor", "end")
+                    .text(function(d) { return bar_format(d.values.perCapitaLoan);});
+
+                //adding the x axis
+                svg.append("g")
+                      .attr("class", "x axis")
+                      .call(xAxis)
+                    .append("text")
+                    .attr("transform", "translate(" + width/2 + ",-20)")
+                    .style("text-anchor", "middle")
+                    .style("font-weight", "bold") 
+                    .text("Percapita loans distributed over a 10 year period");
+                //adding the y axis
+                svg.append("g")
+                    .attr("class", "y axis")
+                    .call(yAxis)
+                    .append("text")
+                    .attr("text-anchor", "middle")
+                    .style("font-weight", "bold") 
+                    .attr("transform", "translate(-35,"+height/2+")rotate(-90)")
+                    .text("State");
+
+            }
+            //plot the chart
+            plot_chart()
+
+        };
+		
+        plot_bubbles(loanData, population);
+
+    };
+    </script>
+</head>
+<body>
+<h1>Peer-to-peer lending</h1>
+  <script type="text/javascript">
+
+//load data using queue to prevent data being loaded at different times
+queue()
+  .defer(d3.json, "data/geo_data.json")
+  .defer(d3.csv, "data/prosperLoanData.csv", 
+      function(data){
+        return {
+          state: data.BorrowerState,
+          loan: +data.LoanOriginalAmount
+        };
+      })
+  .defer(d3.csv, "data/population.csv", 
+      function(data){
+        return {
+          state:  data.stateAbbrev,
+          population: +data.population
+        };
+      })
+  .await(draw);
+
+  </script>
+</body>
+</html>
