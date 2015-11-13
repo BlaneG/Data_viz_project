@@ -4,13 +4,17 @@ Maps:
 * US shapefiles - http://www.census.gov/geo/maps-data/data/tiger-cart-boundary.html
 * Converting shapefile to geoJSON - http://ogre.adc4gis.com/
 * Let's make a bubble map - http://bost.ocks.org/mike/bubble-map/
+* chloropleths - http://bl.ocks.org/mbostock/4060606
 * Understanding geopaths - https://github.com/mbostock/d3/wiki/Geo-Paths
 * d3 geo projections - https://github.com/mbostock/d3/wiki/Geo-Projections
+* tooltips to display data - http://stackoverflow.com/questions/10805184/d3-show-data-on-mouseover-of-circle
+* highlighting states on mouseover with css - http://bl.ocks.org/ericcoopey/ff45f603352fb7475c85
 
 Charting:
 
 * responsive charts with D3 - http://eyeseast.github.io/visible-data/2013/08/28/responsive-charts-with-d3/
 * a bar chart - http://bl.ocks.org/mbostock/1389927#index.html
+
 
 Data tidying:
 

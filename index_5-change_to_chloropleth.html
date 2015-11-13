@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script src="http://d3js.org/queue.v1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/1.5.0/d3-legend.min.js"></script>
+  
+    <style>
+
+    .axis {
+      shape-rendering: crispEdges;
+    }
+
+    .axis path {
+      fill: none;
+    }
+
+    .x.axis line {
+      stroke: #fff;
+      stroke-opacity: .8;
+    }
+
+    .y.axis path {
+      stroke: black;
+    }
+    
+    .q0-9 { fill:rgb(247,251,255); }
+    .q1-9 { fill:rgb(222,235,247); }
+    .q2-9 { fill:rgb(198,219,239); }
+    .q3-9 { fill:rgb(158,202,225); }
+    .q4-9 { fill:rgb(107,174,214); }
+    .q5-9 { fill:rgb(66,146,198); }
+    .q6-9 { fill:rgb(33,113,181); }
+    .q7-9 { fill:rgb(8,81,156); }
+    .q8-9 { fill:rgb(8,48,107); }
+
+
+    .state {
+      stroke: #000;
+      stroke-width: "0.5";
+    }
+
+    .state :hover {
+      fill: #fddbc7;
+    }
+
+    </style>
+</head>
+<body>
+<h1>Peer-to-peer lending</h1>
+    <script type="text/javascript">  
+
+
+    var margin = 75,
+        width = 1400 - margin,
+        height = 600 - margin;
+
+    //create an svg container for the map using the dimensions provided above
+    var svg = d3.select("body").append("svg")
+        .attr("width", width + margin)
+        .attr("height", height + margin)
+
+    //subtitle
+    svg.append("text")
+            .attr("x", margin)             
+            .attr("y", 25)
+            .attr("text-anchor", "left")  
+            .style("font-size", "20px") 
+            .style("font-weight", "bold")   
+            .text("Who in America is leveraging the power of peer to peer loans?");
+    //sub-subtitle
+    svg.append("text")
+            .attr("x", margin)             
+            .attr("y", 25+25)
+            .attr("text-anchor", "left")  
+            .style("font-size", "15px") 
+            .text("Cumulative, per capita loans distributed within each state from 2005-11 to 2015-03*");
+
+    //footnote
+    svg.append("text")
+            .attr("x", width-8*margin)
+            .attr("y", height + margin-5)
+            .attr("text-anchor", "right")
+            .style("font-size", "10px") 
+            .text("* Data loaned using the peer-to-peer lending site Prosper Marketplace");
+
+    //var rateById = d3.map();
+    var quantize = d3.scale.quantize()
+        .domain([0, 6.428])
+        .range(d3.range(9).map(function(i) { return "q" + i + "-9"; }));
+
+    //create a legend
+    //http://d3-legend.susielu.com/
+    var svg = d3.select("svg");
+
+    svg.append("g")
+      .attr("class", "legendQuant")
+      .attr("transform", "translate(20," + 200 + ")")
+
+    //legend title
+    svg.append("text")
+        .attr("transform", "translate(20," + 190 + ")")
+        .style("font-size", "15px")
+        .text("$/capita loaned")
+
+    var legend = d3.legend.color()
+      .labelFormat(d3.format(".2f"))
+      .useClass(true)
+      .scale(quantize);
+
+    svg.select(".legendQuant")
+      .call(legend);
+
+    //load data using queue to prevent data being loaded at different times
+    queue()
+      .defer(d3.json, "data/geo_data.json")
+      .defer(d3.csv, "data/prosperLoanData.csv", 
+          function(data){
+            return {
+              state: data.BorrowerState,
+              loan: +data.LoanOriginalAmount
+            };
+          })
+      .defer(d3.csv, "data/population.csv", 
+          function(data){
+            return {
+              state:  data.stateAbbrev,
+              population: +data.population
+            };
+          })
+      .await(draw);
+
+
+    function draw(error, geo_data, loanData, population) {
+        if (error) throw error;
+
+        var loanDataPerCapita = updateLoanData(aggregateData(loanData), population);
+        //get max for setting domain of radius 
+        //var max_perCapitaloans = d3.max(loanDataPerCapita, function(d) {
+        //                return d.values['perCapitaLoan'];
+        //            });
+
+        //project longitude and latitude data onto an albers USA pixel projection
+        var projection = d3.geo.albersUsa()
+                               .scale(1000)
+                               .translate( [width / 2, height / 1.6]);
+
+        //create the svg objects to render the pixels
+        var path = d3.geo.path().projection(projection);
+
+        var formatNumber = d3.format("$,.2f"); 
+
+        //draw the map
+        var map = svg.append('g')
+                      .attr('class', 'state')
+                    .selectAll('path')//select all the paths in svg
+                      .data(geo_data.features)//bind our geojson data to the empty selection (features contains an array of state coordinates)
+                    .enter()//select all the state paths that are not on the page
+                      .append('path')//append a path to the svg
+                      .attr("class", function(d){
+                        for(var i=0; i<loanDataPerCapita.length; i++){
+                            if(d.properties.STUSPS == loanDataPerCapita[i].key){
+                              return quantize(loanDataPerCapita[i].values.perCapitaLoan);
+                            }
+                        }
+                      })
+                    .attr('d', path)//with d property set to the path object created above;
+                    .append("title")//tooltip from http://stackoverflow.com/questions/10805184/d3-show-data-on-mouseover-of-circle
+                      .text(function(d){
+                        for(var i=0; i<loanDataPerCapita.length; i++){
+                            if(d.properties.STUSPS == loanDataPerCapita[i].key){
+                              return loanDataPerCapita[i].key + "\n Per capita cumulative \n loans distributed in " + loanDataPerCapita[i].key + ":\n" 
+                          + formatNumber(loanDataPerCapita[i].values.perCapitaLoan);
+                            }
+                        }
+                      });
+
+
+
+        function aggregateLoans(leaves){
+            //function for summing leaves in nested loanData
+            var total = d3.sum(leaves, function(d){
+                return d.loan;
+            });
+            return {
+                'cumulativeLoans': total
+            };
+        }
+
+        function updateLoanData(loanData, population){
+            //calculate perCapita cumulative loan amount by state
+            var data = loanData                     
+            for(var i=0; i<data.length; i++){
+                for(var j=0; j<population.length; j++){
+                    if(data[i].key==population[j].state){
+                        data[i].values.perCapitaLoan = data[i].values.cumulativeLoans/population[j].population;
+                    };
+                };
+            };
+            return data;                      
+        }
+
+        function aggregateData(loanData){
+          //This function is using for combinding the prosper loan data with
+          //population data by state
+          
+
+            var loanData = d3.nest()
+                            //the .key function is used for grouping data using 
+                            //an accessor call-back function                
+                            .key(function(d) {
+                              //debugger;
+                              return d.state;
+                            })
+                            //the .rollup function is used to aggregate (e.g. sum) 
+                            //the grouped data
+                            .rollup(aggregateLoans)
+                            .entries(loanData)
+
+            //remove stateless people
+            for(var i=0; i<loanData.length;i++){
+                if(loanData[i].key==""){
+                  loanData.splice(i,1);
+                }
+            }
+
+
+            //return the updated loanData object
+            return loanData;
+        }
+    };
+    </script>
+
+</body>
+</html>

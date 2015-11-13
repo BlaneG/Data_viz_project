@@ -44,6 +44,16 @@
     .y.axis path {
       stroke: black;
     }
+
+    .q0-9 { fill:rgb(247,251,255); }
+    .q1-9 { fill:rgb(222,235,247); }
+    .q2-9 { fill:rgb(198,219,239); }
+    .q3-9 { fill:rgb(158,202,225); }
+    .q4-9 { fill:rgb(107,174,214); }
+    .q5-9 { fill:rgb(66,146,198); }
+    .q6-9 { fill:rgb(33,113,181); }
+    .q7-9 { fill:rgb(8,81,156); }
+    .q8-9 { fill:rgb(8,48,107); }
     </style>
 
 
@@ -54,14 +64,11 @@
     function draw(error, geo_data, loanData, population) {
         if (error) throw error;
 
-        var geo_data = geo_data,
-            loanData = loanData,
-            population = population;
-
         var margin = 75,
             width = 1400 - margin,
             height = 600 - margin;
 
+        //create an svg container for the map using the dimensions provided above
         var svg = d3.select("body")
             .append("svg")
             .attr("width", width + margin)
@@ -70,12 +77,40 @@
             .attr('class', 'map');
 
         svg.append("text")
-                .attr("x", (width / 2))             
-                .attr("y", margin)
-                .attr("text-anchor", "middle")  
+                .attr("x", margin)             
+                .attr("y", 25)
+                .attr("text-anchor", "left")  
                 .style("font-size", "20px") 
-                .style("font-weight", "bold")  
-                .text("State by state differences in cumulative, per capita, \n loans distributed to residents of each state using Prosper from 2005-11 to 2015-03");
+                .style("font-weight", "bold")   
+                .text("Who in America is leveraging the power of peer to peer loans?");
+
+        svg.append("text")
+                .attr("x", margin)             
+                .attr("y", 25+25)
+                .attr("text-anchor", "left")  
+                .style("font-size", "15px") 
+                .text("Cumulative, per capita loans distributed within each state from 2005-11 to 2015-03*");
+
+        //add more text to the map
+        svg.append("text")
+                .attr("x", width-8*margin)
+                .attr("y", height + margin-5)
+                .attr("text-anchor", "right")
+                .style("font-size", "10px") 
+                .text("* Data leant using the peer-to-peer lending site Prosper Marketplace");
+
+        //var rateById = d3.map();
+
+        var quantize = d3.scale.quantize()
+            .domain([0, max_perCapitaloans])
+            .range(d3.range(9).map(function(i) { return "q" + i + "-9"; }));
+
+        var loanDataPerCapita = updateLoanData(aggregateData(loanData), population);
+        debugger;
+        //get max for setting domain of radius 
+        var max_perCapitaloans = d3.max(loanDataPerCapita, function(d) {
+                        return d.values['perCapitaLoan'];
+                    });
 
         //project longitude and latitude data onto an albers USA pixel projection
         var projection = d3.geo.albersUsa()
@@ -91,9 +126,16 @@
                      .enter()//select all the state paths that are not on the page
                      .append('path')//append a path to the svg
                      .attr('d', path)//with d property set to the path object created above
-                     .style('fill', '#ddd')//
-                     .style('stroke', 'black')
-                     .style('stroke-width', 0.5);
+                     .style("class", function(d){
+                        for(var i=0; i<loanDataPerCapita; i++){
+                            if(d.properties == loanDataPerCapita.key){
+                              return quantize(loanDataPerCapita.values.perCapitaLoan);
+                            }
+                        }
+                     });
+                     //.style('fill', '#ddd')//
+                     //.style('stroke', 'black')
+                     //.style('stroke-width', 0.5);
 
         //add a legend for plot colors
         //http://d3-legend.susielu.com/
@@ -169,27 +211,24 @@
             return loanData;
         }
 
-        function plot_bubbles(loanData, population){
+
+        function plot_bubbles(loanDataPerCapita, population){
             //This function is used to plot the bubbles on the map
                                  
             //update cumulativeLoanAmountsort objects based on the cumulative Loans distributed in each state
-            var loanData = updateLoanData(aggregateData(loanData), population)
-
             var loansArray = [];
-            for(var i=0; i<loanData.length; i++){
-              loansArray.push(loanData[i].values.perCapitaLoan);
+
+            for(var i=0; i<loanDataPerCapita.length; i++){
+              loansArray.push(loanDataPerCapita[i].values.perCapitaLoan);
             }
 
             //calculate 1st and 3rd quartile
             var percentile25 = d3.quantile(loansArray, 0.75),
                 percentile75 = d3.quantile(loansArray, 0.25);
 
-            //get max for setting domain of radius                 
-            var max_loans = d3.max(loanData, function(d) {
+                            
+            var max_loans = d3.max(loanDataPerCapita, function(d) {
                             return d.values['cumulativeLoans'];
-                        });
-            var max_perCapitaloans = d3.max(loanData, function(d) {
-                            return d.values['perCapitaLoan'];
                         });
 
             var radius = d3.scale.sqrt()
@@ -202,7 +241,7 @@
             svg.append("g")
                   .attr("class", "bubble")
                 .selectAll("circle")
-                  .data(loanData)
+                  .data(loanDataPerCapita)
                 .enter().append("circle")
                   .attr("r", function(d){return radius(d.values.perCapitaLoan);})
                   //adjust the style using for loops http://www.d3noob.org/2013/01/select-items-with-if-statement-in-d3js.html
@@ -224,91 +263,9 @@
                       + formatNumber(d.values.perCapitaLoan);
                   })   
 
-            function plot_chart(){
-                //this function creates the bar chart
-                //guided by http://bl.ocks.org/mbostock/1389927#index.html
-                
-                //setting the margins margins http://bl.ocks.org/mbostock/3019563
-                var margin = {top: 40, right: 20, left: 50, bottom: 30},
-                    width = 500 - margin.right - margin.left,
-                    bar_width = 20,
-                    height = bar_width*loanData.length - margin.top - margin.bottom;
-
-                var bar_format = d3.format("$,.2f");
-
-                //scaling the axes
-                var x = d3.scale.linear().range([0, width]),
-                    y = d3.scale.ordinal().rangeRoundBands([0, height], .1);
-
-                //formatting the axes
-                var xAxis = d3.svg.axis().scale(x).orient("top").tickSize(-height),
-                    yAxis = d3.svg.axis().scale(y).orient("left").tickSize(0);
-
-                //creating the svg container
-                var svg = d3.select("body").append("svg")
-                              .attr("width", width + margin.left + margin.right)
-                              .attr("height", height + margin.top + margin.bottom)
-                            .append("g")
-                              .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-                //setting the x and y domain
-                x.domain([0, max_perCapitaloans]);
-                y.domain(loanData.map(function(d) {return d.key;}));
-
-                //create a container for each bar
-                var bar = svg.selectAll("g.bar")
-                                .data(loanData)
-                              .enter().append("g")
-                                .attr("class", "bar")
-                                //locate each bar on the y-axis
-                                .attr("transform", function(d) { return "translate(0," + y(d.key) + ")"; });
-
-                //set the dimensions of each bar
-                bar.append("rect")
-                    .attr("width", function(d) { return x(d.values.perCapitaLoan);})
-                    .attr("height", y.rangeBand())
-                     //adjust the style using for loops http://www.d3noob.org/2013/01/select-items-with-if-statement-in-d3js.html
-                    .style("fill", function(d){
-                        if(d.values.perCapitaLoan<percentile25){return "#67a9cf";}
-                        if(d.values.perCapitaLoan>percentile75){return "#ef8a62";}
-                    });
-
-                //adding text of values to the end of each bar
-                bar.append("text")
-                    .attr("class", "value")
-                    .attr("x", function(d) { return x(d.values.perCapitaLoan);})
-                    .attr("y", y.rangeBand() / 2)
-                    .attr("dx", 20)
-                    .attr("dy", ".35em")
-                    .attr("text-anchor", "end")
-                    .text(function(d) { return bar_format(d.values.perCapitaLoan);});
-
-                //adding the x axis
-                svg.append("g")
-                      .attr("class", "x axis")
-                      .call(xAxis)
-                    .append("text")
-                    .attr("transform", "translate(" + width/2 + ",-20)")
-                    .style("text-anchor", "middle")
-                    .style("font-weight", "bold") 
-                    .text("Percapita loans distributed over a 10 year period");
-                //adding the y axis
-                svg.append("g")
-                    .attr("class", "y axis")
-                    .call(yAxis)
-                    .append("text")
-                    .attr("text-anchor", "middle")
-                    .style("font-weight", "bold") 
-                    .attr("transform", "translate(-35,"+height/2+")rotate(-90)")
-                    .text("State");
-
-            }
-            //plot the chart
-            plot_chart()
-
         };
 		
-        plot_bubbles(loanData, population);
+        plot_bubbles(loanDataPerCapita, population);
 
     };
     </script>
