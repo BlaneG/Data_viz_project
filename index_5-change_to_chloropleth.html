@@ -151,6 +151,26 @@
 
         var formatNumber = d3.format("$,.2f"); 
 
+        function hoverText(d){
+            //This function provide the tool tip for displaying data when each state is hovered over
+              for(var i=0; i<loanDataPerCapita.length; i++){
+                  if(d.properties.STUSPS == loanDataPerCapita[i].key){
+                    return loanDataPerCapita[i].key + "\n Per capita cumulative \n loans distributed in " 
+                    + loanDataPerCapita[i].key + ":\n" 
+                    + formatNumber(loanDataPerCapita[i].values.perCapitaLoan);
+                  }
+              }
+        }
+
+        function colorStates(d){
+            //this function is used to color each state
+            for(var i=0; i<loanDataPerCapita.length; i++){
+                if(d.properties.STUSPS == loanDataPerCapita[i].key){
+                  return quantize(loanDataPerCapita[i].values.perCapitaLoan);
+                }
+            }
+        }
+
         //draw the map
         var map = svg.append('g')
                       .attr('class', 'state')
@@ -159,21 +179,12 @@
                     .enter()//select all the state paths that are not on the page
                       .append('path')//append a path to the svg
                       .attr("class", function(d){
-                        for(var i=0; i<loanDataPerCapita.length; i++){
-                            if(d.properties.STUSPS == loanDataPerCapita[i].key){
-                              return quantize(loanDataPerCapita[i].values.perCapitaLoan);
-                            }
-                        }
+                          return colorStates(d);
                       })
                     .attr('d', path)//with d property set to the path object created above;
                     .append("title")//tooltip from http://stackoverflow.com/questions/10805184/d3-show-data-on-mouseover-of-circle
                       .text(function(d){
-                        for(var i=0; i<loanDataPerCapita.length; i++){
-                            if(d.properties.STUSPS == loanDataPerCapita[i].key){
-                              return loanDataPerCapita[i].key + "\n Per capita cumulative \n loans distributed in " + loanDataPerCapita[i].key + ":\n" 
-                          + formatNumber(loanDataPerCapita[i].values.perCapitaLoan);
-                            }
-                        }
+                          return hoverText(d);
                       });
 
 
@@ -225,10 +236,20 @@
                 }
             }
 
-
             //return the updated loanData object
             return loanData;
         }
+
+
+        var outliers = [{"state": "ND", "label": "North Dakota", "dx": 0, "dy": margin}, {"state": "IA", "label": "Iowa State", "dx": 20, "dy": 2*margin}, {"state": "ME", "label": "Maine", "dx": -margin, "dy": 0}, {"state": "DC", "label": "District of Columbia", "dx": margin, "dy":0}];
+
+        function labelOutliers(geo_data, perCapitaLoan){
+            //This function is used to highlight states that are outliers
+            debugger;
+        }
+
+        labelOutliers()
+        
     };
     </script>
 

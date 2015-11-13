@@ -132,10 +132,10 @@
                               return quantize(loanDataPerCapita.values.perCapitaLoan);
                             }
                         }
-                     });
-                     //.style('fill', '#ddd')//
-                     //.style('stroke', 'black')
-                     //.style('stroke-width', 0.5);
+                     })
+                     .style('fill', '#ddd')//
+                     .style('stroke', 'black')
+                     .style('stroke-width', 0.5);
 
         //add a legend for plot colors
         //http://d3-legend.susielu.com/
@@ -237,6 +237,14 @@
 
             var formatNumber = d3.format("$,.2f"); 
 
+            function locateCentroid(d){
+                for(var i=0; i<geo_data.features.length; i++){
+                  if(geo_data.features[i].properties.STUSPS==d.key){
+                    return "translate(" + path.centroid(geo_data.features[i]) + ")";
+                  }
+                }
+            }
+
             //add bubbles to map    
             svg.append("g")
                   .attr("class", "bubble")
@@ -250,11 +258,7 @@
                       if(d.values.perCapitaLoan>percentile75){return "#ef8a62";}
                   })
                   .attr("transform", function(d){
-                      for(var i=0; i<geo_data.features.length; i++){
-                        if(geo_data.features[i].properties.STUSPS==d.key){
-                          return "translate(" + path.centroid(geo_data.features[i]) + ")";
-                        }
-                      }
+                      return locateCentroid(d);
                   })
                 .append("title")
                   .text(function(d){
