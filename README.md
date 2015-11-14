@@ -1,12 +1,12 @@
 # Data_viz_project
 ##Summary
-This visualization shows the cumulative, per capita loans distributed for each state over a period of about 10 years.  The data is displayed using a bubble plot and bar chart for each state.  The plot illustrates which states are the biggest users of peer to peer lending through Prosper.  Prosper is a peer to peer lending operation that helps to connect individual borrowers with lenders.  It's a more formal approach to lending operating outside of the traditional bank credit market.  The Prosper dataset provides a rich set of information about individual loans distributed in the US.  Given the state level geographic labels provided for individual loans, the dataset provides many opportunities for visually exploring variability across geographic regions. Key outliers in the dataset include DC ($6.43 in cumulative, per capita loans distributed) as well as ND, IA, MD ($0.32-0.37 in cumulative, per capita loans distributed).  
+This visualization answers the question:  who in American is using peer to peer lending.  It uses a coloured map (a chloropleth) to show which states are using peer-to-peer loans (dollars per capita) over a period of roughly 10 years using data from Prosper Marketplace.  Prosper is a peer to peer lending site that connects individual borrowers with lenders.  It's a more formal approach to lending operating outside of the traditional bank credit market.  The Prosper dataset provides a rich set of information about individual loans distributed in the US.  Given the state level geographic labels provided for individual loans, the dataset provides many opportunities for visualizing the data with maps. Key outliers in the dataset include DC ($6.43 in cumulative, per capita loans distributed) as well as ND, IA, MD ($0.32-0.37 in cumulative, per capita loans distributed).  
 
 This data viz project was put together for completion of Udacity's data visualization course.  The dataset is made available by [Prosper](https://www.prosper.com/) and includes 81 variables (e.g. loan amount, interest rate, etc.) for over 100,000 peer-to-peer loans in the US.   
 
 ##Design
 
-The aim of this visualization was to illustrate the cumulative, per capita value of loans distributed by each state spanning the temporal bounds of the dataset (November 15th, 2005 - March 12th, 2014).  A map was used to illustrate geographic differences in per capita loan distributions using a bubble plot.  Data points in the upper (red) and lower (blue) quartile are color coded with red and blue respectively while the interquartile range is color coded with a light grey.  Per capita loans distributed in red states are roughly twice as high as those in blue states. A bar chart was added to help the audience quickly rank the differences in per capita loan value distributed by state since it is more difficult to explore differences between individual states from the bubble plot.  The area of each bubble is scaled to the square root of the cumulative, per capita loans distributed to residents of each state.  When using bubbles, it is important to scale the size of the bubble to the square root of the parameter you are plotting because the radius is used to format bubble size, and the area of a circle is proportional to it's radius<sup>2</sup>.  By hovering over each bubble with the mouse, a textbox can is activated displaying the cumulative, per capita loan amount distributed within the state.
+The aim of this visualization was to illustrate the cumulative, per capita value of loans distributed to each state spanning the temporal bounds of the dataset (November 15th, 2005 - March 12th, 2014).  A chloropleth map was used to illustrate the findings with the darker states having borrowed more money per capita over the time horizon.  By hovering over each bubble with the mouse, a textbox can is activated displaying the numerical data for each state.  Outliers in the data are labelled.
 
 ##Feedback
 Feedback from early iterations incorprated into the visualization included:
@@ -17,6 +17,8 @@ Feedback from early iterations incorprated into the visualization included:
 
 3) A lot of the bubbles look like they are a similar size.  Does this plot really tell us anything interesting? 
    -a bar chart was added below the map to help illustrate differences in cumulative, per capita loans distributed to residents within each state.
+   
+4) A chloropleth would be more useful to avoid overplotting in the Northeast.
 
 ##Resources
 The following resources we used to implement the visualizations for this project:
@@ -29,6 +31,9 @@ The following resources we used to implement the visualizations for this project
    - Let's make a bubble map - http://bost.ocks.org/mike/bubble-map/
    - Understanding geopaths - https://github.com/mbostock/d3/wiki/Geo-Paths
    - d3 geo projections - https://github.com/mbostock/d3/wiki/Geo-Projections
+   - d3 geo projections - https://github.com/mbostock/d3/wiki/Geo-Projections
+   - tooltips to display data - http://stackoverflow.com/questions/10805184/d3-show-data-on-mouseover-of-circle
+   - highlighting states on mouseover with css - http://bl.ocks.org/ericcoopey/ff45f603352fb7475c85
 
 * Charting:
 
