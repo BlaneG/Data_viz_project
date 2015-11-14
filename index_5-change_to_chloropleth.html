@@ -254,7 +254,8 @@
             //This function is used to highlight states that are outliers
 
             //create an object of outliers
-            var outliers = [{"state": "ND", "label": "North Dakota", "dx": -25, "dy": -margin}, {"state": "IA", "label": "Iowa State", "dx": 20, "dy": -2*margin}, {"state": "ME", "label": "Maine", "dx": -margin, "dy": 0}, {"state": "DC", "label": "District of Columbia", "dx": margin, "dy":0}];
+            var outliers = [{"state": "ND", "label": "North Dakota", "dx": -25, "dy": -margin}, {"state": "IA", "label": "Iowa State", "dx": 20, "dy": -2*margin}, {"state": "ME", "label": "Maine", "dx": -margin, "dy": 0}, {"state": "DC", "label": "District of Columbia", "dx": 2*margin, "dy":0}];
+
             svg.append("g")
               .attr("class", "state-label")
               .selectAll("text")
@@ -267,12 +268,25 @@
                 .attr("dy", function(d){return d.dy; })
                 .text(function(d){
                   return d.label;
-                });
+                })
+                .attr("text-anchor", "middle");
 
+            function drawLines(){
+            //This function adds lines to point to outlier states
+            //http://gis.stackexchange.com/questions/49114/d3-geo-path-to-draw-a-path-from-gis-coordinates
 
+                //line start and end points
+                var lines = [{type: "LineString", coordinates: [[-100.5, 47.7], [-104, 51.4],]}, {type: "LineString", coordinates: [[-93, 42.2], [-91, 49.9]]}, {type: "LineString", coordinates: [[-69, 45.4], [-73, 46.3]]}, {type: "LineString", coordinates: [[-77, 38.9], [-71.3, 38.1]]}]
 
+                for(var i=0; i<lines.length; i++){
+                    svg.append("path")
+                    .datum(lines[i])
+                    .attr("d", path)
+                    .style({'stroke-width': 1, 'stroke': '#B10000', 'stroke-linejoin': 'round'});
+                }              
+            }
 
-
+            drawLines()
 
         }
 
