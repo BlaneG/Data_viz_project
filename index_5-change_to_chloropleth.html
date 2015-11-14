@@ -77,6 +77,14 @@
             .style("font-size", "15px") 
             .text("Cumulative, per capita loans distributed within each state from 2005-11 to 2015-03*");
 
+    svg.append("text")
+            .attr("x", margin)
+            .attr("y", 75)
+            .attr("text-anchor", "left")
+            .style("font-size", "14px") 
+            .style("fill", "#005a32")
+            .text("Outliers are indicated with labels");
+
     //footnote
     svg.append("text")
             .attr("x", width-8*margin)
@@ -84,6 +92,8 @@
             .attr("text-anchor", "right")
             .style("font-size", "10px") 
             .text("* Data loaned using the peer-to-peer lending site Prosper Marketplace");
+
+
 
     //var rateById = d3.map();
     var quantize = d3.scale.quantize()
@@ -105,7 +115,7 @@
         .text("$/capita loaned")
 
     var legend = d3.legend.color()
-      .labelFormat(d3.format(".2f"))
+      .labelFormat(d3.format("$.2f"))
       .useClass(true)
       .scale(quantize);
 
@@ -249,12 +259,19 @@
             }
         }
 
+        function returnValue(d, loanDataPerCapita){
+           for(var i=0; i<loanDataPerCapita.length; i++){
+              if(d==loanDataPerCapita[i].key){
+                return formatNumber(loanDataPerCapita[i].values.perCapitaLoan);
+              }
+           }
+        }
 
         function labelOutliers(geo_data, loanDataPerCapita){
             //This function is used to highlight states that are outliers
 
             //create an object of outliers
-            var outliers = [{"state": "ND", "label": "North Dakota", "dx": -25, "dy": -margin}, {"state": "IA", "label": "Iowa State", "dx": 20, "dy": -2*margin}, {"state": "ME", "label": "Maine", "dx": -margin, "dy": 0}, {"state": "DC", "label": "District of Columbia", "dx": 2*margin, "dy":0}];
+            var outliers = [{"state": "ND", "label": "North Dakota", "dx": -25, "dy": -margin}, {"state": "IA", "label": "Iowa State", "dx": 20, "dy": -2*margin}, {"state": "ME", "label": "Maine", "dx": -1.75*margin, "dy": 0}, {"state": "DC", "label": "District of Columbia", "dx": 2.75*margin, "dy":0}];
 
             svg.append("g")
               .attr("class", "state-label")
@@ -267,9 +284,10 @@
                 .attr("dx", function(d) {return d.dx; })
                 .attr("dy", function(d){return d.dy; })
                 .text(function(d){
-                  return d.label;
+                  return d.label + " " + returnValue(d.state, loanDataPerCapita) + " per capita";
                 })
-                .attr("text-anchor", "middle");
+                .attr("text-anchor", "middle")
+                .style("fill", "#005a32");
 
             function drawLines(){
             //This function adds lines to point to outlier states
@@ -282,7 +300,7 @@
                     svg.append("path")
                     .datum(lines[i])
                     .attr("d", path)
-                    .style({'stroke-width': 1, 'stroke': '#B10000', 'stroke-linejoin': 'round'});
+                    .style({'stroke-width': 1, 'stroke': '#636363', 'stroke-linejoin': 'round'});
                 }              
             }
 
