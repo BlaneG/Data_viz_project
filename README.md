@@ -15,7 +15,7 @@ The aim of this visualization was to illustrate the cumulative, per capita value
 ## Feedback
 Feedback from early iterations incorprated into the visualization included:
 
-1) It was pointed out that some of the smaller bubbles were originally hidden beneath large bubbles such that the hover functionality to display the data wasn't working for smaller bubbles.  The data was sorted to layer the smallest bubble plots on top so overlapping large bubbles wouldn't obscure smaller bubbles.
+1) An early iteration of the data visualization explored use of a bubble map to display the data. It was pointed out that some of the smaller bubbles were originally hidden beneath large bubbles and the hover functionality to display data wasn't working for these smaller hidden bubbles.  The data was sorted to layer the smallest bubble plots on top so overlapping large bubbles wouldn't obscure smaller bubbles.
 
 2) The bubble plot originally displayed the cumulative loans distributed to each state.  It was suggested that the bubbles be scaled based on the population of each state to illustrate differences in per capita loans distributed to residents in each state.
 
