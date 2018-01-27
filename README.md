@@ -1,14 +1,18 @@
 # Data_viz_project
-##Summary
+
+## Summary
+
+Check out a the visualization I created [here](https://htmlpreview.github.io/?https://github.com/BlaneG/Data_viz_project/blob/master/index_5-change_to_chloropleth.html)(may take a few minutes to load all the data)
+
 This visualization answers the question:  who in American is using peer to peer lending.  It uses a coloured map (a chloropleth) to show which states are using peer-to-peer loans (dollars per capita) over a period of roughly 10 years using data from Prosper Marketplace.  Prosper is a peer to peer lending site that connects individual borrowers with lenders.  It's a more formal approach to lending operating outside of the traditional bank credit market.  The Prosper dataset provides a rich set of information about individual loans distributed in the US.  Given the state level geographic labels provided for individual loans, the dataset provides many opportunities for visualizing the data with maps. Key outliers in the dataset include DC ($6.43 in cumulative, per capita loans distributed) as well as ND, IA, MD ($0.32-0.37 in cumulative, per capita loans distributed).  
 
 This data viz project was put together for completion of Udacity's data visualization course.  The dataset is made available by [Prosper](https://www.prosper.com/) and includes 81 variables (e.g. loan amount, interest rate, etc.) for over 100,000 peer-to-peer loans in the US.   
 
-##Design
+## Design
 
 The aim of this visualization was to illustrate the cumulative, per capita value of loans distributed to each state spanning the temporal bounds of the dataset (November 15th, 2005 - March 12th, 2014).  A chloropleth map was used to illustrate the findings with the darker states having borrowed more money per capita over the time horizon.  By hovering over each bubble with the mouse, a textbox can is activated displaying the numerical data for each state.  Outliers in the data are labelled.
 
-##Feedback
+## Feedback
 Feedback from early iterations incorprated into the visualization included:
 
 1) It was pointed out that some of the smaller bubbles were originally hidden beneath large bubbles such that the hover functionality to display the data wasn't working for smaller bubbles.  The data was sorted to layer the smallest bubble plots on top so overlapping large bubbles wouldn't obscure smaller bubbles.
@@ -20,7 +24,7 @@ Feedback from early iterations incorprated into the visualization included:
    
 4) A chloropleth would be more useful to avoid overplotting in the Northeast.
 
-##Resources
+## Resources
 The following resources we used to implement the visualizations for this project:
 
 * Maps:
