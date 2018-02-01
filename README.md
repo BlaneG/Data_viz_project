@@ -2,7 +2,7 @@
 
 ## Summary
 
-Check out a the visualization I created for this project using D3.js [here](https://htmlpreview.github.io/?https://github.com/BlaneG/Data_viz_project/blob/master/index_5-change_to_chloropleth.html) (may take a few seconds to load, and javascipt may be blocked if visualization does not fully load).
+Check out a visualization I created for this project using D3.js [here](https://htmlpreview.github.io/?https://github.com/BlaneG/Data_viz_project/blob/master/index_5-change_to_chloropleth.html) (may take a few seconds to load, and javascipt may be blocked if visualization does not fully load).
 
 This visualization answers the question:  who in American is using peer to peer lending.  It uses a coloured map (a chloropleth) to show which states are using peer-to-peer loans (dollars per capita) over a period of roughly 10 years using data from Prosper Marketplace.  Prosper is a peer to peer lending site that connects individual borrowers with lenders.  It's a more formal approach to lending operating outside of the traditional bank credit market.  The Prosper dataset provides a rich set of information about individual loans distributed in the US.  Given the state level geographic labels provided for individual loans, the dataset provides many opportunities for visualizing the data with maps. Key outliers in the dataset include DC ($6.43 in cumulative, per capita loans distributed) as well as ND, IA, MD ($0.32-0.37 in cumulative, per capita loans distributed).  
 
