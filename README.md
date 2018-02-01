@@ -1,4 +1,4 @@
-# Data_viz_project
+# Peer-to-peer lending data visualizatin project with D3.js
 
 ## Summary
 
